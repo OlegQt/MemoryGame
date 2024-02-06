@@ -1,22 +1,25 @@
 package com.memorygame.presentation
 
-import com.memorygame.presentation.viewmodel.MemoryButton
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+
 
 class GameLogic {
-    var buttonsQuantity = 10
+    private var memorySticksQuantity = 2
 
-    private val memoryButtonList = mutableListOf<MemoryButton>()
+    val memoryList = mutableListOf<Flow<MemoryStick>>()
 
-    fun increaseMemory() {
-        buttonsQuantity++
-    }
+    fun changeSticksQuantity(newQuantity: Int) {
+        this.memorySticksQuantity = newQuantity
 
-
-    fun fillMemory() {
-        memoryButtonList.clear()
-
-        repeat(times = buttonsQuantity) {
-            memoryButtonList.add(MemoryButton(id = it))
+        memoryList.clear()
+        repeat(memorySticksQuantity) {
+            memoryList.add(flow { emit(MemoryStick("stick $it")) })
         }
     }
+
 }
+
+data class MemoryStick(
+    var name: String
+)
