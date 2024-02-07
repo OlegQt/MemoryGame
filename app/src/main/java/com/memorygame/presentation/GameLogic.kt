@@ -1,25 +1,40 @@
 package com.memorygame.presentation
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 
 class GameLogic {
-    private var memorySticksQuantity = 2
 
-    val memoryList = mutableListOf<Flow<MemoryStick>>()
+    private var listOfSticks: MutableList<MutableStateFlow<MemoryStick>> = mutableListOf()
+    val gameState = MutableStateFlow(listOfSticks)
+
 
     fun changeSticksQuantity(newQuantity: Int) {
-        this.memorySticksQuantity = newQuantity
+        listOfSticks = mutableListOf()
 
-        memoryList.clear()
-        repeat(memorySticksQuantity) {
-            memoryList.add(flow { emit(MemoryStick("stick $it")) })
+        repeat(newQuantity) {
+            listOfSticks.add(MemoryStick(name = it.toString()).toStateFlow())
         }
+
+        gameState.update { listOfSticks }
+    }
+
+    fun update() {
+        listOfSticks.forEach {
+            val element = it.value
+            element.name = element.name.plus(" /a")
+            it.value = element
+        }
+
+        gameState.update { listOfSticks }
+    }
+
+    data class MemoryStick(
+        var name: String,
+        var isPushed: Boolean = false
+    ) {
+        fun toStateFlow(): MutableStateFlow<MemoryStick> = MutableStateFlow(this)
     }
 
 }
-
-data class MemoryStick(
-    var name: String
-)

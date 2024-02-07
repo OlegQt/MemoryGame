@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.memorygame.presentation.GameLogic
+import kotlin.random.Random
 
 class GameViewModel : ViewModel() {
     private val _logLine = MutableLiveData<String>("initial\n")
@@ -13,7 +14,7 @@ class GameViewModel : ViewModel() {
     val darkMode = _darkMode as LiveData<Boolean>
 
     private val gameEngine = GameLogic()
-
+    val gameState = gameEngine.gameState
 
     init {
         _logLine.value = "Hi"
@@ -24,5 +25,13 @@ class GameViewModel : ViewModel() {
         _darkMode.value?.let {
             _darkMode.value = !it
         }
+    }
+
+    fun updateDynamic(){
+        gameEngine.changeSticksQuantity(Random.nextInt(10))
+    }
+
+    fun remake(){
+        gameEngine.update()
     }
 }
