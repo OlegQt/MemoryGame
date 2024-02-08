@@ -37,30 +37,38 @@ fun App(vm: GameViewModel) {
             Switch(
                 checked = vm.darkMode.observeAsState().value ?: false,
                 onCheckedChange = { vm.switchTheme() })
-            Button(onClick = { vm.updateDynamic() }) {
-                Text(text = "Quantity")
+            Button(onClick = { vm.newGame(10) }) {
+                Text(text = "newSet")
             }
-            Button(onClick = { vm.remake() }) {
-                Text(text = "/A")
+            Button(onClick = { }) {
+                Text(text = "Button")
             }
         }
-        
+
         DynamicObjects(vm = vm)
     }
 }
 
 @Composable
-fun DynamicObjects(vm:GameViewModel){
-    val gameState = vm.gameState.collectAsState()
-    
-    Text(text = gameState.value.size.toString())
-    
+fun DynamicObjects(vm: GameViewModel) {
+    val quantity = vm.memoryCount.observeAsState()
+
+    Text(text = "Q=$quantity")
+
     Column(modifier = Modifier.fillMaxWidth()) {
-        gameState.value.forEach { 
-            val stick = it.collectAsState()
-            
-            Text(text = stick.value.name)
+        repeat(quantity.value!!) {
+            MemoryStick(stickId = it, vm)
         }
     }
-    
+}
+
+@Composable
+fun MemoryStick(stickId: Int, vm: GameViewModel) {
+    val stickState = vm.getStick(id = stickId).collectAsState()
+    val stick = stickState.value
+
+    Button(onClick = { vm.pushItem(itemPushedId = stick.id) }) {
+        Text(text = stick.name)
+
+    }
 }
