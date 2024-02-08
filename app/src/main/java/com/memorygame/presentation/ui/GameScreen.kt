@@ -37,7 +37,7 @@ fun App(vm: GameViewModel) {
             Switch(
                 checked = vm.darkMode.observeAsState().value ?: false,
                 onCheckedChange = { vm.switchTheme() })
-            Button(onClick = { vm.newGame(10) }) {
+            Button(onClick = { vm.newGame(8) }) {
                 Text(text = "newSet")
             }
             Button(onClick = { }) {
@@ -57,6 +57,8 @@ fun DynamicObjects(vm: GameViewModel) {
 
     Column(modifier = Modifier.fillMaxWidth()) {
         repeat(quantity.value!!) {
+
+
             MemoryStick(stickId = it, vm)
         }
     }
