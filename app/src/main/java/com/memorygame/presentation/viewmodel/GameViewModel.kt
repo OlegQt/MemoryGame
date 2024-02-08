@@ -1,17 +1,13 @@
 package com.memorygame.presentation.viewmodel
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.memorygame.presentation.GameLogic
 
 import com.memorygame.presentation.MemoryStick
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class GameViewModel : ViewModel() {
@@ -21,15 +17,15 @@ class GameViewModel : ViewModel() {
     private val _darkMode = MutableLiveData<Boolean>(true)
     val darkMode = _darkMode as LiveData<Boolean>
 
-    private val _memoryCount = MutableLiveData<Int>(null)
-    val memoryCount = _memoryCount as LiveData<Int>
+    private val _rowQuantity = MutableLiveData<Int>(null)
+    val rowQuantity = _rowQuantity as LiveData<Int>
 
     private val memoryList: MutableList<MutableStateFlow<MemoryStick>> = mutableListOf()
 
 
     init {
         _logLine.value = "Hi"
-        newGame(10)
+        newGame(4)
     }
 
     fun switchTheme() {
@@ -38,16 +34,16 @@ class GameViewModel : ViewModel() {
         }
     }
 
-    fun newGame(memoryStickQuantity: Int) {
+    fun newGame(newRowQuantity: Int) {
         memoryList.clear()
 
-        repeat(times = memoryStickQuantity) {
+        repeat(times = newRowQuantity * newRowQuantity) {
             memoryList.add(
-                MutableStateFlow(MemoryStick(id = it, name = "stick $it"))
+                MutableStateFlow(MemoryStick(id = it, name = "S$it"))
             )
         }
 
-        _memoryCount.value = memoryStickQuantity
+        _rowQuantity.value = newRowQuantity
     }
 
     fun pushItem(itemPushedId: Int) {
@@ -57,14 +53,13 @@ class GameViewModel : ViewModel() {
 
         viewModelScope.launch {
             delay(200)
-            newStick.value = newStick.value.copy(name = "Stick")
+            newStick.value = newStick.value.copy(name = "S")
         }
     }
 
-    fun getStick(id: Int): MutableStateFlow<MemoryStick> {
-        if (memoryList.isEmpty()) return MutableStateFlow(MemoryStick(id = 0, name = "Default"))
-        return memoryList.elementAt(index = id)
+    fun getStick(id: Int): MutableStateFlow<MemoryStick>? {
+        return if (memoryList.size < id) null
+        else memoryList.elementAt(index = id)
     }
-
 
 }

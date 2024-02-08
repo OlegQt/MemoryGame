@@ -51,26 +51,34 @@ fun App(vm: GameViewModel) {
 
 @Composable
 fun DynamicObjects(vm: GameViewModel) {
-    val quantity = vm.memoryCount.observeAsState()
+    // Recomposition данной функции происходит при смене числа строк и столбцов в матрице
+    // В этом случае все элементы списка с карточками заменяются на новые
+    val rowQuantity = vm.rowQuantity.observeAsState()
+    val rQ = rowQuantity.value ?: 0
 
-    Text(text = "Q=$quantity")
-
-    Column(modifier = Modifier.fillMaxWidth()) {
-        repeat(quantity.value!!) {
-
-
-            MemoryStick(stickId = it, vm)
+    // Располагаем элементы матрицей
+    var element = 0
+    repeat(rQ) {
+        Column {
+            Row {
+                repeat(rQ) {
+                    MemoryStick(stickId = element++, vm)
+                }
+            }
         }
     }
 }
 
+
 @Composable
 fun MemoryStick(stickId: Int, vm: GameViewModel) {
-    val stickState = vm.getStick(id = stickId).collectAsState()
-    val stick = stickState.value
+    val stickState = vm.getStick(id = stickId)?.collectAsState()
+    val stick = stickState?.value
 
-    Button(onClick = { vm.pushItem(itemPushedId = stick.id) }) {
-        Text(text = stick.name)
-
+    stick?.let {
+        Button(onClick = { vm.pushItem(itemPushedId = it.id) }) {
+            Text(text = it.name)
+        }
     }
+
 }
