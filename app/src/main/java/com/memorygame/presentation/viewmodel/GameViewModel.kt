@@ -3,10 +3,10 @@ package com.memorygame.presentation.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.memorygame.presentation.GameLogic
-import com.memorygame.presentation.MemoryStick
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.pow
 
 class GameViewModel : ViewModel() {
@@ -18,8 +18,7 @@ class GameViewModel : ViewModel() {
 
     private val gameEngine = GameLogic()
 
-    private val _dataListFlow = MutableStateFlow<List<MemoryStick>>(emptyList())
-    val dataListFlow: StateFlow<List<MemoryStick>> = _dataListFlow
+    val list = mutableListOf<String>("A","C","Q")
 
     init {
         newGame(4)
@@ -34,14 +33,22 @@ class GameViewModel : ViewModel() {
     fun newGame(newRowQuantity: Int) {
         gameEngine.startNewGame(quantity = newRowQuantity.quad())
 
-        _dataListFlow.value = gameEngine.getGameState()
+        viewModelScope.launch { openAllSticks(2000L) }
+
     }
 
-    fun pushItem(itemPushedId: Int): Boolean {
-        return gameEngine.push(itemPushedId)
+    private suspend fun openAllSticks(durationTime: Long) {
+        gameEngine.openCloseAll(mode = true)
+
+        delay(durationTime)
+
+        gameEngine.openCloseAll(mode = false)
+
     }
 
     private fun Int.quad(): Int {
         return this.toDouble().pow(2).toInt()
     }
+
+    fun getGameState() = gameEngine.getGameState()
 }

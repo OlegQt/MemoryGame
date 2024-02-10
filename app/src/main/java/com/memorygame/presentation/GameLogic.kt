@@ -1,10 +1,12 @@
 package com.memorygame.presentation
 
+import androidx.compose.runtime.mutableStateListOf
+
 
 class GameLogic() {
 
     private var quantityOfSticks = 0
-    private val memoryStickList = mutableListOf<MemoryStick>()
+    private val memoryStickList = mutableStateListOf<MemoryStick>()
 
     fun startNewGame(quantity: Int) {
         quantityOfSticks = quantity
@@ -19,10 +21,16 @@ class GameLogic() {
         return memoryStickList.elementAt(index = itemPushedId).apply {
             isOpened = !isOpened
         }.isOpened
-
     }
 
-    fun getGameState(): List<MemoryStick> {
-        return memoryStickList.toList()
+    fun openCloseAll(mode: Boolean) {
+        memoryStickList.forEach {
+            it.isOpened = mode
+
+            if (!mode) it.name = "D"
+        }
+        memoryStickList.add(MemoryStick())
     }
+
+    fun getGameState() = memoryStickList
 }
