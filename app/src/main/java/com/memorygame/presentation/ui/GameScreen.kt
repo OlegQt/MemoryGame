@@ -15,10 +15,6 @@ import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import com.memorygame.presentation.MemoryStick
@@ -38,17 +34,7 @@ fun GameScreen(vm: GameViewModel) {
 
 @Composable
 fun App(vm: GameViewModel) {
-    //val logTxt = vm.logLine.observeAsState()
-
-
     Column() {
-        //Text(text = logTxt.value.toString())
-        val lst = remember {
-            vm.list.toMutableStateList()
-        }
-        Text(text = lst.toList().toString())
-
-
         Row(modifier = Modifier.fillMaxWidth()) {
             Switch(
                 checked = vm.darkMode.observeAsState().value ?: false,
@@ -56,25 +42,14 @@ fun App(vm: GameViewModel) {
             Button(onClick = { vm.newGame(6) }) {
                 Text(text = "newSet")
             }
-            Button(onClick = {
-               val kl = lst.elementAt(0).apply {
-                   this.plus("dfe")
-               }
-
-
-            }) {
-                Text(text = "new task")
-            }
         }
-
-        //DynamicObjects(vm = vm)
         DataList(viewModel = vm)
     }
 }
 
 @Composable
 fun DataList(viewModel: GameViewModel) {
-    val dataList = viewModel.getGameState()
+    val dataList = viewModel.getGameState
 
     Column {
         dataList.chunked(4).forEach {
@@ -92,12 +67,14 @@ fun DataList(viewModel: GameViewModel) {
 @Composable
 fun MemoryStick(stick: MemoryStick, vm: GameViewModel) {
 
-    val isOpened = rememberSaveable { mutableStateOf(stick.isOpened) }
+    val isOpened = stick.isOpened
 
-    IconButton(onClick = {}) {
+    IconButton(onClick = {
+        vm.pushStick(stick.id)
+    }) {
         Column {
             // ICON
-            if (isOpened.value) Icon(imageVector = Icons.Filled.ThumbUp, contentDescription = null)
+            if (isOpened) Icon(imageVector = Icons.Filled.ThumbUp, contentDescription = null)
             else Icon(imageVector = Icons.Rounded.ArrowDropDown, contentDescription = null)
 
             // TimeLeft

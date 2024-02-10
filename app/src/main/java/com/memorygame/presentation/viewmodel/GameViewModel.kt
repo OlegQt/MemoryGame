@@ -17,8 +17,7 @@ class GameViewModel : ViewModel() {
     val darkMode = _darkMode as LiveData<Boolean>
 
     private val gameEngine = GameLogic()
-
-    val list = mutableListOf<String>("A","C","Q")
+    val getGameState get() = gameEngine.getGameState()
 
     init {
         newGame(4)
@@ -34,21 +33,21 @@ class GameViewModel : ViewModel() {
         gameEngine.startNewGame(quantity = newRowQuantity.quad())
 
         viewModelScope.launch { openAllSticks(2000L) }
-
     }
 
     private suspend fun openAllSticks(durationTime: Long) {
-        gameEngine.openCloseAll(mode = true)
+        gameEngine.openCloseAll(true)
 
         delay(durationTime)
 
-        gameEngine.openCloseAll(mode = false)
+        gameEngine.openCloseAll(false)
+    }
 
+    fun pushStick(stickId: Int) {
+        viewModelScope.launch { gameEngine.push(itemPushedId = stickId) }
     }
 
     private fun Int.quad(): Int {
         return this.toDouble().pow(2).toInt()
     }
-
-    fun getGameState() = gameEngine.getGameState()
 }

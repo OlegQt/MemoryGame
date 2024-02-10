@@ -1,10 +1,10 @@
 package com.memorygame.presentation
 
 import androidx.compose.runtime.mutableStateListOf
+import kotlinx.coroutines.delay
 
 
 class GameLogic() {
-
     private var quantityOfSticks = 0
     private val memoryStickList = mutableStateListOf<MemoryStick>()
 
@@ -17,19 +17,16 @@ class GameLogic() {
         }
     }
 
-    fun push(itemPushedId: Int): Boolean {
-        return memoryStickList.elementAt(index = itemPushedId).apply {
-            isOpened = !isOpened
-        }.isOpened
+    suspend fun push(itemPushedId: Int) {
+        memoryStickList[itemPushedId] = memoryStickList[itemPushedId].copy(isOpened = true)
+        delay(300)
+        memoryStickList[itemPushedId] = memoryStickList[itemPushedId].copy(isOpened = false)
     }
 
     fun openCloseAll(mode: Boolean) {
-        memoryStickList.forEach {
-            it.isOpened = mode
-
-            if (!mode) it.name = "D"
+        for (index in 0 until memoryStickList.size){
+            memoryStickList[index]=memoryStickList[index].copy(isOpened = mode)
         }
-        memoryStickList.add(MemoryStick())
     }
 
     fun getGameState() = memoryStickList
