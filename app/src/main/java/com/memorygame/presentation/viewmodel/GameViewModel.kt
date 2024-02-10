@@ -3,12 +3,11 @@ package com.memorygame.presentation.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-
+import com.memorygame.presentation.GameLogic
 import com.memorygame.presentation.MemoryStick
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.StateFlow
+import kotlin.math.pow
 
 class GameViewModel : ViewModel() {
     private val _logLine = MutableLiveData<String>("initial\n")
@@ -17,14 +16,12 @@ class GameViewModel : ViewModel() {
     private val _darkMode = MutableLiveData<Boolean>(true)
     val darkMode = _darkMode as LiveData<Boolean>
 
-    private val _rowQuantity = MutableLiveData<Int>(null)
-    val rowQuantity = _rowQuantity as LiveData<Int>
+    private val gameEngine = GameLogic()
 
-    private val memoryList: MutableList<MutableStateFlow<MemoryStick>> = mutableListOf()
-
+    private val _dataListFlow = MutableStateFlow<List<MemoryStick>>(emptyList())
+    val dataListFlow: StateFlow<List<MemoryStick>> = _dataListFlow
 
     init {
-        _logLine.value = "Hi"
         newGame(4)
     }
 
@@ -35,31 +32,16 @@ class GameViewModel : ViewModel() {
     }
 
     fun newGame(newRowQuantity: Int) {
-        memoryList.clear()
+        gameEngine.startNewGame(quantity = newRowQuantity.quad())
 
-        repeat(times = newRowQuantity * newRowQuantity) {
-            memoryList.add(
-                MutableStateFlow(MemoryStick(id = it, name = "S$it"))
-            )
-        }
-
-        _rowQuantity.value = newRowQuantity
+        _dataListFlow.value = gameEngine.getGameState()
     }
 
-    fun pushItem(itemPushedId: Int) {
-        val newStick = memoryList.elementAt(index = itemPushedId)
-
-        newStick.value = newStick.value.copy(name = "F")
-
-        viewModelScope.launch {
-            delay(200)
-            newStick.value = newStick.value.copy(name = "S")
-        }
+    fun pushItem(itemPushedId: Int): Boolean {
+        return gameEngine.push(itemPushedId)
     }
 
-    fun getStick(id: Int): MutableStateFlow<MemoryStick>? {
-        return if (memoryList.size < id) null
-        else memoryList.elementAt(index = id)
+    private fun Int.quad(): Int {
+        return this.toDouble().pow(2).toInt()
     }
-
 }
