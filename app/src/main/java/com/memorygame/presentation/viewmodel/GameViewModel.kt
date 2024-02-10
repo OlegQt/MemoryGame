@@ -50,7 +50,7 @@ class GameViewModel : ViewModel() {
         viewModelScope.launch { gameEngine.push(itemPushedId = stickId) }
     }
 
-    private fun Int.quad(): Int {
+    fun Int.quad(): Int {
         return this.toDouble().pow(2).toInt()
     }
 }
