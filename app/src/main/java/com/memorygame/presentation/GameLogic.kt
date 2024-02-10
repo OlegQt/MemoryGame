@@ -19,11 +19,23 @@ class GameLogic() {
         repeat(quantity) {
             memoryStickList.add(
                 MemoryStick(
-                    id = it,
-                    pictureId = Random.nextInt(StickIcon.values().size - 1)
+                    id = it
                 )
             )
         }
+
+        // Заполнение иконками
+        var index = 0
+        while (index < quantity-1) {
+            val iconIndex = Random.nextInt(StickIcon.values().size - 1)
+
+            changeItem(itemId = index, picture = iconIndex)
+            changeItem(itemId = quantity - index, picture = iconIndex)
+
+            index+=2
+        }
+
+        //memoryStickList.shuffle()
     }
 
     suspend fun push(itemPushedId: Int) {
@@ -47,7 +59,7 @@ class GameLogic() {
             currentSelectedStickId = itemPushedId
             changeItem(itemPushedId, opened = true)
 
-            delay(800)
+            delay(1000)
             currentSelectedStickId = null
             if (memoryStickList[itemPushedId].isEnabled) {
                 changeItem(itemPushedId, opened = false)
@@ -61,7 +73,12 @@ class GameLogic() {
         }
     }
 
-    private fun changeItem(itemId: Int, opened: Boolean? = null, enabled: Boolean? = null) {
+    private fun changeItem(
+        itemId: Int,
+        opened: Boolean? = null,
+        enabled: Boolean? = null,
+        picture: Int? = null
+    ) {
         if (itemId < memoryStickList.size) {
             if (opened != null) {
                 memoryStickList[itemId] = memoryStickList[itemId].copy(isOpened = opened)
@@ -69,7 +86,9 @@ class GameLogic() {
             if (enabled != null) {
                 memoryStickList[itemId] = memoryStickList[itemId].copy(isEnabled = enabled)
             }
+            if (picture != null) {
+                memoryStickList[itemId] = memoryStickList[itemId].copy(pictureId = picture)
+            }
         }
     }
-
 }

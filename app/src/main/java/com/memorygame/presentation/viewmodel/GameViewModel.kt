@@ -35,10 +35,10 @@ class GameViewModel : ViewModel() {
         sticksQuantity =newRowQuantity
         gameEngine.startNewGame(quantity = newRowQuantity.quad())
 
-        viewModelScope.launch { openAllSticks(2000L) }
+        viewModelScope.launch { showAllSticks(60000L) }
     }
 
-    private suspend fun openAllSticks(durationTime: Long) {
+    private suspend fun showAllSticks(durationTime: Long) {
         gameEngine.openCloseAll(true)
 
         delay(durationTime)
@@ -50,7 +50,7 @@ class GameViewModel : ViewModel() {
         viewModelScope.launch { gameEngine.push(itemPushedId = stickId) }
     }
 
-    private fun Int.quad(): Int {
+    fun Int.quad(): Int {
         return this.toDouble().pow(2).toInt()
     }
 }
