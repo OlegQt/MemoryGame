@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.memorygame.presentation.GameLogic
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.pow
@@ -19,7 +20,9 @@ class GameViewModel : ViewModel() {
     private val gameEngine = GameLogic()
     val getGameState get() = gameEngine.getGameState()
 
-    var sticksQuantity:Int = 0
+    var sticksQuantity: Int = 0
+
+    var hideAllSticks: Job? = null
 
     init {
         newGame(4)
@@ -32,17 +35,32 @@ class GameViewModel : ViewModel() {
     }
 
     fun newGame(newRowQuantity: Int) {
-        sticksQuantity =newRowQuantity
+        sticksQuantity = newRowQuantity
         gameEngine.startNewGame(quantity = newRowQuantity.quad())
 
-        viewModelScope.launch { showAllSticks(6000L) }
+        showAllSticks()
+
+        // Завершить предыдущую корутину
+        hideAllSticks?.cancel()
+
+        hideAllSticks = viewModelScope.launch {
+            closeAllSticks(6000L)
+        }
     }
 
-    private suspend fun showAllSticks(durationTime: Long) {
+    private fun showAllSticks() {
         gameEngine.openCloseAll(true)
+    }
 
-        delay(durationTime)
+    private suspend fun closeAllSticks(durationTime: Long) {
+        var timer = 0L
+        while (timer < durationTime) {
+            _logLine.value = "Time $timer"
+            delay(50)
+            timer += 50L
+        }
 
+        //delay(durationTime)
         gameEngine.openCloseAll(false)
     }
 
@@ -50,7 +68,7 @@ class GameViewModel : ViewModel() {
         viewModelScope.launch { gameEngine.push(itemPushedId = stickId) }
     }
 
-    fun Int.quad(): Int {
+    private fun Int.quad(): Int {
         return this.toDouble().pow(2).toInt()
     }
 }
