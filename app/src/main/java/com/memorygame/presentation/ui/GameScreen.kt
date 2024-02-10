@@ -44,6 +44,8 @@ fun App(vm: GameViewModel) {
         NewGame(vm)
         NightModeSwitch(vm)
 
+        Text(text = vm.logLine.observeAsState().value.toString())
+
         Divider(Modifier.padding(vertical = 16.dp))
 
         DataList(viewModel = vm)
