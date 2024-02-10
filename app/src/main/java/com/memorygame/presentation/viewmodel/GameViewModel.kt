@@ -35,7 +35,7 @@ class GameViewModel : ViewModel() {
         sticksQuantity =newRowQuantity
         gameEngine.startNewGame(quantity = newRowQuantity.quad())
 
-        viewModelScope.launch { showAllSticks(60000L) }
+        viewModelScope.launch { showAllSticks(6000L) }
     }
 
     private suspend fun showAllSticks(durationTime: Long) {
