@@ -10,14 +10,12 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ThumbUp
-import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Color
 import com.memorygame.presentation.MemoryStick
+import com.memorygame.presentation.StickIcon
 import com.memorygame.presentation.theme.GameTheme
 import com.memorygame.presentation.viewmodel.GameViewModel
 
@@ -50,9 +48,10 @@ fun App(vm: GameViewModel) {
 @Composable
 fun DataList(viewModel: GameViewModel) {
     val dataList = viewModel.getGameState
+    val memoryRowsCount = viewModel.sticksQuantity
 
     Column {
-        dataList.chunked(4).forEach {
+        dataList.chunked(memoryRowsCount).forEach {
             Row {
                 it.forEach { data ->
                     // Display the list of data using composable
@@ -63,22 +62,25 @@ fun DataList(viewModel: GameViewModel) {
     }
 }
 
-
 @Composable
 fun MemoryStick(stick: MemoryStick, vm: GameViewModel) {
-
     val isOpened = stick.isOpened
+    val color = if (stick.isEnabled) Color.DarkGray else Color.Blue
 
     IconButton(onClick = {
-        vm.pushStick(stick.id)
+        if (stick.isEnabled) vm.pushStick(stick.id)
     }) {
         Column {
-            // ICON
-            if (isOpened) Icon(imageVector = Icons.Filled.ThumbUp, contentDescription = null)
-            else Icon(imageVector = Icons.Rounded.ArrowDropDown, contentDescription = null)
-
-            // TimeLeft
-            Text(text = stick.name, fontSize = 12.sp)
+            if (isOpened) Icon(
+                imageVector = StickIcon.values()[stick.pictureId].imageVector,
+                contentDescription = null,
+                tint = color
+            )
+            else Icon(
+                imageVector = StickIcon.values().last().imageVector,
+                contentDescription = null,
+                tint = color
+            )
         }
     }
 }

@@ -19,6 +19,8 @@ class GameViewModel : ViewModel() {
     private val gameEngine = GameLogic()
     val getGameState get() = gameEngine.getGameState()
 
+    var sticksQuantity:Int = 0
+
     init {
         newGame(4)
     }
@@ -30,6 +32,7 @@ class GameViewModel : ViewModel() {
     }
 
     fun newGame(newRowQuantity: Int) {
+        sticksQuantity =newRowQuantity
         gameEngine.startNewGame(quantity = newRowQuantity.quad())
 
         viewModelScope.launch { openAllSticks(2000L) }
